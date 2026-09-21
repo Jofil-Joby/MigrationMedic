@@ -1,50 +1,133 @@
 # MigrationMedic
 
-> Portable agent for detecting suspicious duplicate database migration versions.
+> A portable engineering agent for **database migration hygiene**.
 
-## What it does
+MigrationMedic inspects observable project evidence, detects **duplicate or suspicious migration versions**, and produces an explainable improvement plan. Its purpose is not to replace specialist tooling. It provides a focused, auditable diagnostic layer that can travel across agent runtimes.
 
-MigrationMedic inspects migration filenames and looks for duplicate version numbers. When multiple migration files appear to claim the same version, it reports the evidence and recommends reviewing migration ordering.
+## What makes it different
 
-### Diagnostic fingerprint
-
-**Migration history → version collision → evidence → repair plan**
-
-## Why this agent is distinct
-
-MigrationMedic focuses on the temporal structure of database changes. It is not a schema-diff engine and does not assume that every naming irregularity is a production failure.
-
-Its key signal is simple: multiple migration files containing the same version identifier.
-
-## Workflow
+This project follows an **evidence → decision → explanation** model:
 
 ```text
-Migration files
-      ↓
-Version extraction
-      ↓
-Duplicate-version rule
-      ↓
-Evidence-backed finding
-      ↓
-Ordering / migration review
+Project
+  ↓
+Scanner
+  ↓
+Domain Evidence
+  ↓
+Deterministic Diagnostic Rule
+  ↓
+Finding + Evidence + Confidence
+  ↓
+Improvement Plan
 ```
+
+The agent does not invent evidence. A finding is tied to what the scanner can actually observe.
+
+## Diagnostic contract
+
+| Layer | MigrationMedic behavior |
+| --- | --- |
+| Domain | database migration hygiene |
+| Primary signal | migration filenames and version numbers |
+| Remediation | Review migration ordering and unique versions |
+| Output | Structured, explainable findings |
+| Uncertainty | Explicitly constrained by available evidence |
+
+## Portable architecture
+
+```text
+                    ┌─────────────────────┐
+                    │   Portable Agent    │
+                    │ identity + behavior  │
+                    └──────────┬──────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              ↓                ↓                ↓
+          Diagnostic        Duties &         Explainability
+            Logic           Workflow           Contract
+              │
+              ↓
+        Runtime Adapters
+       ┌──────┬──────┬──────┬──────┐
+       ↓      ↓      ↓      ↓
+    OpenAI  CrewAI  Claude  Lyzr
+```
+
+The core diagnostic logic is kept separate from framework-specific adapters. This is the central design idea of the project, not four copies of the same agent wearing different hats.
+
+## Repository structure
+
+```text
+agent.yaml          # Portable identity and passport metadata
+SOUL.md             # Identity, principles, and behavior
+AGENTS.md           # Agent responsibilities
+DUTIES.md           # Maker / Checker workflow
+EXPLAINABILITY.md   # Decision, inputs, limits, and evidence contract
+core/               # Shared result model
+tools/              # Scanner and domain diagnostics
+skills/             # Declared capabilities
+workflows/          # Agent workflows
+adapters/           # Runtime-facing adapters
+tests/              # Deliberately diagnostic project fixtures
+```
+
+## Passport portability
+
+The agent is structured for the OpenGAP passport model and can be exported to:
+
+- OpenAI Agents SDK
+- CrewAI
+- Claude Code
+- Lyzr
+
+The important part is the **portable contract**: identity, behavior, duties, explainability, tools, and skills remain defined independently of a single runtime.
 
 ## Verification
 
 The repository includes:
-- OpenGAP passport metadata
-- duplicate-version migration fixture
-- behavior and explainability contracts
-- four framework portability adapters
-- automated adapter verification
 
-OpenGAP validation passed and all four generated framework exports have been exercised successfully.
+- Local adapter verification
+- A domain-specific broken-project fixture
+- OpenGAP-compatible passport metadata
+- Explainability requirements
+- Export verification across the supported targets
 
-## Design principle
+The engineering workflow is:
 
-**Migration history is operational data.** MigrationMedic treats version collisions as an observable integrity signal and keeps the recommendation tied to that evidence.
+```text
+Validate passport
+    → Verify adapters
+    → Run diagnostic fixture
+    → Export with OpenGAP
+    → Inspect generated artifacts
+```
 
-## Medic family
+## Scope and limitations
 
-MigrationMedic is the database-migration specialist in the Medic family, sharing the same portable passport contract while owning a distinct diagnostic domain.
+MigrationMedic is a focused diagnostic prototype. Its conclusions are limited to the evidence and rules implemented in this repository. It should complement, not replace, production-grade static analysis, security scanners, observability platforms, CI systems, or human review where appropriate.
+
+## Why this project exists
+
+This repository is one member of a deliberately modular **Medic agent family**. Each agent applies the same portable passport architecture to a different engineering failure surface.
+
+That makes the collection useful as an interoperability experiment:
+
+```text
+One passport architecture
+        +
+Different diagnostic domains
+        +
+Multiple agent runtimes
+        =
+Portable engineering-agent family
+```
+
+## Challenge context
+
+Built for the **HiDevs × Lyzr Agent Passport Challenge**, exploring portable agent identity, behavior contracts, explainability, verification, and framework interoperability.
+
+## Author
+
+**Jofil Joby**  
+[GitHub](https://github.com/Jofil-Joby)
