@@ -1,0 +1,4 @@
+﻿spec_version: "0.1.0"
+name: migration-medic
+version: "0.1.0"
+description: A portable AI agent that analyzes database migrations and produces an explainable improvement plan.
